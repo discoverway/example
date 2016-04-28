@@ -1,4 +1,4 @@
-package t4.demo.rabbitmq;
+package t4.rabbitmq.routing;
 
 import java.io.IOException;
 import java.util.Random;
@@ -26,7 +26,7 @@ public class Producer {
 	    
 	    for (int i = 0; i < 6; i++) {  
             String level = getLevel();  
-            String message = level + "_log :" + UUID.randomUUID().toString().toUpperCase();  
+            String message = level + "_log :" + UUID.randomUUID().toString().toUpperCase();
             /** Set routing key */
             channel.basicPublish(EXCHANGE_NAME, level, null, message.getBytes());  
             System.out.println(" [x] Sent '" + message + "'");  

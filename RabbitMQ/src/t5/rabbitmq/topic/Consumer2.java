@@ -1,7 +1,6 @@
-package t4.demo.rabbitmq;
+package t5.rabbitmq.topic;
 
 import java.io.IOException;
-import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
 import com.rabbitmq.client.Channel;
@@ -9,13 +8,13 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.ConsumerCancelledException;
 import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.QueueingConsumer.Delivery;
 import com.rabbitmq.client.ShutdownSignalException;
 
-public class Consumer {
-
-	private final static String EXCHANGE_NAME = "direct";
-	private static final String[] LEVELS = { "INFO", "WARNING", "ERROR" };
+public class Consumer2 {
 	
+	private final static String EXCHANGE_NAME = "topic";
+
 	public static void main(String[] args) throws IOException, TimeoutException, ShutdownSignalException, ConsumerCancelledException, InterruptedException {
 		ConnectionFactory factory = new ConnectionFactory();
 	    factory.setHost("54.215.185.67");
@@ -24,25 +23,20 @@ public class Consumer {
 	    Connection connection = factory.newConnection();
 	    Channel channel = connection.createChannel();
 	    /** Declare Exchange */
-	    channel.exchangeDeclare(EXCHANGE_NAME, "direct" );
+	    channel.exchangeDeclare(EXCHANGE_NAME, "topic" );
 	    /** Get default queue name */
 	    String queueName = channel.queueDeclare().getQueue();
-	    String level = getLevel();
-	    channel.queueBind(queueName, EXCHANGE_NAME, level);
+	    channel.queueBind(queueName, EXCHANGE_NAME, "*.critical");
 	    QueueingConsumer consumer = new QueueingConsumer(channel);
         channel.basicConsume(queueName, true, consumer);
-        System.out.println(" [*] Waiting for [" + level + "] logs......");
-        
-        while (true) {
-            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+	    System.out.println("[*] Waiting for messages about critical.");
+	    
+	    while (true) {
+            Delivery delivery = consumer.nextDelivery();
             String message = new String(delivery.getBody());
-            System.out.println(" [x] Received '" + message + "'");
+            String routingKey = delivery.getEnvelope().getRoutingKey();
+            System.out.println("[x] Received routingKey = " + routingKey + ", message = " + message + ".");
         }
-
 	}
-	
-	private static String getLevel() {
-        Random random = new Random();
-        return LEVELS[random.nextInt(3)];
-    }
+
 }

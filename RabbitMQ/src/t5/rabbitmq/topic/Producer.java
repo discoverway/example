@@ -1,6 +1,7 @@
-package t3.demo.rabbitmq;
+package t5.rabbitmq.topic;
 
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import com.rabbitmq.client.Channel;
@@ -9,7 +10,7 @@ import com.rabbitmq.client.ConnectionFactory;
 
 public class Producer {
 	
-	private final static String EXCHANGE_NAME = "fanout";
+	private final static String EXCHANGE_NAME = "topic";
 
 	public static void main(String[] args) throws IOException, TimeoutException {
 		ConnectionFactory factory = new ConnectionFactory();
@@ -19,13 +20,17 @@ public class Producer {
 	    Connection connection = factory.newConnection();
 	    Channel channel = connection.createChannel();
 	    /** Declare Exchange */
-	    channel.exchangeDeclare(EXCHANGE_NAME, "fanout" );
-	    String message = "Broadcast content....";
-	    channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes());
-	    System.out.println(" [x] Sent '" + message + "'");
+	    channel.exchangeDeclare(EXCHANGE_NAME, "topic");
+
+	    String[] routingKeys = new String[] { "kernel.info", "cron.warning", "auth.info", "kernel.critical" };
+	    for(String routingKey : routingKeys) {
+	    	String message = UUID.randomUUID().toString().toUpperCase();
+	    	channel.basicPublish(EXCHANGE_NAME, routingKey, null, message.getBytes());
+	    	System.out.println("[x] Sent routingKey = "+ routingKey + " , message = " + message + ".");
+	    }
 	    
-	    channel.close();
-	    connection.close();
+	    channel.close();  
+        connection.close();
 	}
 
 }
