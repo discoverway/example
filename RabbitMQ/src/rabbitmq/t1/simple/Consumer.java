@@ -1,4 +1,4 @@
-package t1.rabbitmq.simple;
+package rabbitmq.t1.simple;
 
 import java.util.concurrent.TimeoutException;
 

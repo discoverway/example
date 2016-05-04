@@ -1,4 +1,4 @@
-package t5.rabbitmq.topic;
+package rabbitmq.t5.topic;
 
 import java.io.IOException;
 import java.util.UUID;

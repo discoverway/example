@@ -1,4 +1,4 @@
-package t4.rabbitmq.routing;
+package rabbitmq.t4.routing;
 
 import java.io.IOException;
 import java.util.Random;

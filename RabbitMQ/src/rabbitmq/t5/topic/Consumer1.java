@@ -1,4 +1,4 @@
-package t3.rabbitmq.broadcast;
+package rabbitmq.t5.topic;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -8,11 +8,12 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.ConsumerCancelledException;
 import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.QueueingConsumer.Delivery;
 import com.rabbitmq.client.ShutdownSignalException;
 
-public class Consumer2 {
+public class Consumer1 {
 
-    private final static String EXCHANGE_NAME = "fanout";
+    private final static String EXCHANGE_NAME = "topic";
 
     public static void main(String[] args) throws IOException, TimeoutException, ShutdownSignalException,
 	    ConsumerCancelledException, InterruptedException {
@@ -23,20 +24,20 @@ public class Consumer2 {
 	Connection connection = factory.newConnection();
 	Channel channel = connection.createChannel();
 	/** Declare Exchange */
-	channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
+	channel.exchangeDeclare(EXCHANGE_NAME, "topic");
 	/** Get default queue name */
 	String queueName = channel.queueDeclare().getQueue();
-	channel.queueBind(queueName, EXCHANGE_NAME, "");
+	channel.queueBind(queueName, EXCHANGE_NAME, "kernel.*");
 	QueueingConsumer consumer = new QueueingConsumer(channel);
 	channel.basicConsume(queueName, true, consumer);
-	System.out.println(" [*] Waiting for messages......");
+	System.out.println("[*] Waiting for messages about kernel.");
 
 	while (true) {
-	    QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+	    Delivery delivery = consumer.nextDelivery();
 	    String message = new String(delivery.getBody());
-	    System.out.println(" [x] Received '" + message + "'");
+	    String routingKey = delivery.getEnvelope().getRoutingKey();
+	    System.out.println("[x] Received routingKey = " + routingKey + ", message = " + message + ".");
 	}
-
     }
 
 }

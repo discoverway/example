@@ -1,4 +1,4 @@
-package t2.rabbitmq.persistent.ack;
+package rabbitmq.t2.persistent.ack;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;

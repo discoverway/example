@@ -1,4 +1,4 @@
-package t3.rabbitmq.broadcast;
+package rabbitmq.t3.broadcast;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
